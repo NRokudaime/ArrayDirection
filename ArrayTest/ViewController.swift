@@ -10,17 +10,24 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    typealias DirectionPoint = (collumn: Int, line: Int)
-    
+    @IBOutlet weak var inputTextView: UITextView!
+    @IBOutlet weak var outputTextView: UITextView!
+    typealias Point = (collumn: Int, line: Int)
     @IBInspectable var inputValue: Int = 3
-
     var arrayForTest:Array<Array<Int>> = [[]]
+    var outputString = ""
+    
+    func move(collumPos: Int, linePos: Int, direction: Direction) -> Point {
+        outputString.append("\(arrayForTest[linePos][collumPos]) ")
+        arrayForTest[linePos][collumPos] = -1
+        return (collumPos + direction.coordinate.collumn, linePos + direction.coordinate.line)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let arraySize = 2 * inputValue - 1
-        
+        var inputText = ""
         for line in (0..<arraySize) {
             if line > 0 {
                 arrayForTest.append([])
@@ -28,45 +35,42 @@ class ViewController: UIViewController {
             for _ in (0..<arraySize) {
                 arrayForTest[line].append(Int(arc4random() % 99))
             }
-            print(String(describing: arrayForTest[line].map({ String(format: "%02d", $0) })))
+            inputText.append("\(arrayForTest[line].map({ String(format: "%02d", $0) }).joined(separator: " "))\n")
         }
+        inputTextView.text = inputText
         
-        print("")
         let centerIndex = inputValue - 1
-        print("Center point: \(arrayForTest[centerIndex][centerIndex])")
+        outputTextView.text = outputTextView.text + "\nCenter point: \(arrayForTest[centerIndex][centerIndex])"
         
-        var outputString = "\(arrayForTest[centerIndex][centerIndex]) "
+        outputString = "\(arrayForTest[centerIndex][centerIndex]) "
         var linePos = centerIndex
         var collumPos = centerIndex - 1
         var direction: Direction = .bottom
         
-        for _ in (0..<(arraySize * arraySize) - 1) {
-            if collumPos < 0 || linePos < 0 {
-                break
-            }
-            outputString.append("\(arrayForTest[linePos][collumPos]) ")
-            arrayForTest[linePos][collumPos] = -1
-            collumPos = collumPos + direction.coordinate.collumn
-            linePos = linePos + direction.coordinate.line
+        while (collumPos >= 0 && linePos >= 0) {
+            let newPoints = move(collumPos: collumPos, linePos: linePos, direction: direction)
+            collumPos = newPoints.collumn
+            linePos = newPoints.line
             
             if abs(centerIndex - linePos) == abs(centerIndex - collumPos) {
                 if arrayForTest[linePos + direction.next.coordinate.line][collumPos + direction.next.coordinate.collumn] == -1 {
-                    outputString.append("\(arrayForTest[linePos][collumPos]) ")
-                    collumPos = collumPos + direction.coordinate.collumn
-                    linePos = linePos + direction.coordinate.line
+                    let newPoints = move(collumPos: collumPos, linePos: linePos, direction: direction)
+                    collumPos = newPoints.collumn
+                    linePos = newPoints.line
+                    
                 }
                 direction = direction.next
             }
         }
-        print("")
-        print(outputString)
+        
+        outputTextView.text = outputTextView.text + "\n\(outputString)"
         
     }
 
     enum Direction {
         case left, bottom, right, top
         
-        var coordinate: DirectionPoint {
+        var coordinate: Point {
             switch self {
             case .left:
                 return (-1, 0)
