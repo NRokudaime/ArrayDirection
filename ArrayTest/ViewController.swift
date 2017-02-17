@@ -13,7 +13,13 @@ class ViewController: UIViewController {
     @IBOutlet weak var inputTextView: UITextView!
     @IBOutlet weak var outputTextView: UITextView!
     typealias Point = (collumn: Int, line: Int)
-    @IBInspectable var inputValue: Int = 3
+    @IBInspectable var inputValue: Int = 5 {
+        didSet{
+            if inputValue < 1 {
+                inputValue = 1
+            }
+        }
+    }
     var arrayForTest:Array<Array<Int>> = [[]]
     var outputString = ""
     
