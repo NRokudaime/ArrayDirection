@@ -20,6 +20,8 @@ class ArrayWritter {
         self.inputValue = inputValue
     }
     
+    /// Получение строки в виде спирали "изнутри наружу"
+    /// - parameter complection: обработка полученной строки
     func spiralString(complection:@escaping ((String) -> Void)) {
         DispatchQueue.global(qos: .background).async { [weak self] in
             
